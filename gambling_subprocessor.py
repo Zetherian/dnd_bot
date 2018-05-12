@@ -16,13 +16,13 @@ def simple_math(times, sides):
 
 # Performs math based on the operator in the original message.
 # Returns the results as a separate list.
-def complex_math(results, expression, operand):
+def complex_math(results, expression = "+", operand = 0):
     # Declaring dictionary of functions with the key set to each operator.
     operators = {
              "+": operator.add,
              "-": operator.sub,
              "*": operator.mul,
-             "/": operator.truediv,
+             "/": operator.floordiv, #Is more consistent than round()
              "^": operator.pow,
              "%": operator.mod
                 }
@@ -35,7 +35,7 @@ def complex_math(results, expression, operand):
 # roll totals. Uses the lists returned by 'complex_math()' and
 # 'simple_math()'.
 
-def build_message(string, results, final_results, comment):
+def build_message(string, results, final_results, comment = ""):
     # Splitting comment from rest of the string.
     string = string.split(" #")[0]
     # Removing "!roll " from the string as it is the first 6 characters.
@@ -76,9 +76,6 @@ def roll(string):
         # incase there were none entered in the original message.
         times = int(m.group(1))
         sides = int(m.group(2))
-        comment = ""
-        expression = "+"
-        operand = 0
         # If regex match  5 exists, replace comment with its contents.
         if m.group(5):
             comment = m.group(5)
@@ -103,3 +100,4 @@ def cast(string):
         return roll("!roll {0}".format(casts[string[6:]]))
     else:
         return "This command did not meet the required syntax or match an existing cast."
+
