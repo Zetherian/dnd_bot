@@ -7,32 +7,49 @@ import gambling_subprocessor as gambler
 #   Update tests to do more than validate random inputs, tests should validate mathmatical truths as well
 #   Add more functions once rounding gets settled.
 
+
+
+#Constants
+ALL_DICE=[1, #Because people will try it
+          2,
+          3, #There are rock/paper/scissor dice.
+          4,
+          6,
+          8,
+          10, #Handles d10 and perc
+          12,
+          20]
+
+ROLL_AMT=[1,
+          2,
+          4,
+          16,
+          256]
+
+
 class TestSimple(unittest.TestCase):
 
     #Tests for simple_math
     #Really too simple of a function to test but nonetheless tested to be thorough.
 
     def test_len(self):
-        #Ensures the size of the results matches the nunmber of dice rolled
-        none = len(gambler.simple_math(0, 999))
-        one = len(gambler.simple_math(1, 1))
-        small = len(gambler.simple_math(10, 6))
-        medium = len(gambler.simple_math(50, 50))
-        large = len(gambler.simple_math(10000, 100))
-       
+       #Ensures the size of the results matches the nunmber of dice rolled
+        for amount in ROLL_AMT:
+            for dice in ALL_DICE:
+                result=len(gambler.simple_math(amount, dice))
+                self.assertEqual(amount, result)
+
         #Testing for times > 1 without a dice val.
         with self.assertRaises(ValueError) as ve:
-           len(gambler.simple_math(1,0)) 
+           len(gambler.simple_math(1,0))
 
+        #Validating we can roll a dice zero times
+        none = len(gambler.simple_math(0, ALL_DICE[-1]))
         self.assertEqual(none, 0)
-        self.assertEqual(one, 1)
-        self.assertEqual(small, 10)
-        self.assertEqual(medium, 50)
-        self.assertEqual(large, 10000)
 
 
     def test_neg(self):
-        #Where doing negative tests even though regex should trim them.
+        #We're doing negative tests even though regex should trim them.
         #just to validate what should happen
         n_times=gambler.simple_math(-1, 20)         #I feel like these two assertions, should raise exceptions.
         double_n=gambler.simple_math(-200, -200)    #Considering it is not possible to have negative dicerolls with no modifiers.
@@ -45,16 +62,13 @@ class TestSimple(unittest.TestCase):
 
 
     def test_val(self):
-        certain= gambler.simple_math(1,1)
-        large_vals= gambler.simple_math(200, 20)
-        
-        #Make sure the most basic example works 
-        self.assertEqual([1], certain)
-
         #Make sure all the rolled values are under the dice's maximum
-        for val in large_vals:
-            self.assertLessEqual(val, 20)
-    
+        for dice in ALL_DICE:
+            result=gambler.simple_math(ROLL_AMT[-1], dice)
+            for value in result:
+                self.assertLessEqual(value, dice)
+
+
 
 
 
@@ -65,10 +79,10 @@ class TestComplex(unittest.TestCase):
 
 
     #Testing positive/negative , single/multi valued lists where we can.
-    #We can add more complex tests as the need arises. 
+    #We can add more complex tests as the need arises.
     def test_add(self):
         exp="+"
-        
+
         simple=gambler.complex_math([10], exp, 5)
         n_simple=gambler.complex_math([10], exp, -5)
 
@@ -80,11 +94,11 @@ class TestComplex(unittest.TestCase):
 
         self.assertEqual(multi, [30, 25, 20, 15, 11])
         self.assertEqual(n_multi, [10, 5, 0, -5, -9])
-   
+
 
     def test_sub(self):
         exp="-"
-        
+
         simple=gambler.complex_math([10], exp, 5)
         n_simple=gambler.complex_math([10], exp, -5)
 
@@ -99,7 +113,7 @@ class TestComplex(unittest.TestCase):
 
     def test_mul(self):
         exp="*"
-        
+
         simple=gambler.complex_math([10], exp, 5)
         n_simple=gambler.complex_math([10], exp, -5)
 
@@ -116,9 +130,9 @@ class TestComplex(unittest.TestCase):
     #Tests below this point suffer in what they can do at the current rounding state.
     #They should be treated as placeholders and not trusted.
     def test_div(self):
-        #This does not account for proper divison as the plan is to use floor div to fix rounding errors. 
+        #This does not account for proper divison as the plan is to use floor div to fix rounding errors.
         exp="/"
-        
+
         simple=gambler.complex_math([10], exp, 5)
         n_simple=gambler.complex_math([10], exp, -5)
 
@@ -132,9 +146,9 @@ class TestComplex(unittest.TestCase):
         #self.assertEqual(n_multi, [-2, -2, -1, -1, -1])
 
     def test_pow(self):
-        #This does not account for proper divison as the plan is to use floor div to fix rounding errors. 
+        #This does not account for proper divison as the plan is to use floor div to fix rounding errors.
         exp="^"
-        
+
         simple=gambler.complex_math([10], exp, 5)
         n_simple=gambler.complex_math([10], exp, -5)
 
@@ -146,7 +160,7 @@ class TestComplex(unittest.TestCase):
 
     def test_mod(self):
         exp="%"
-        
+
         simple=gambler.complex_math([10], exp, 5)
         n_simple=gambler.complex_math([10], exp, -5)
 
